@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from 'src/components/user/user.module';
 
 @Module({
   imports: [UserModule],

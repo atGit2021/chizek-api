@@ -9,7 +9,7 @@ export class DbMigrationService implements OnModuleInit {
       databaseName: this.configService.getOrThrow('DB_NAME'),
       url: this.configService.getOrThrow('MONGODB_URI'),
     },
-    migrationsDir: `${__dirname}/../../migrations`,
+    migrationsDir: `${__dirname}/migrations`,
     changelogCollectionName: 'changelog',
     migrationFileExtension: '.js',
   };
