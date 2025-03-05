@@ -1,13 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserResolver } from './user.resolver';
-import { UserService } from './user.service';
+import { UserModule } from './user.module';
+import { MockDatabaseModule } from 'src/common/database/mock-database.module';
+import { disconnect } from 'mongoose';
+
 
 describe('UserResolver', () => {
+  let module: TestingModule;
   let resolver: UserResolver;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [UserResolver, UserService],
+    module = await Test.createTestingModule({
+      imports: [UserModule, MockDatabaseModule],
     }).compile();
 
     resolver = module.get<UserResolver>(UserResolver);
@@ -16,4 +20,9 @@ describe('UserResolver', () => {
   it('should be defined', () => {
     expect(resolver).toBeDefined();
   });
+
+  afterAll(async () => {
+    await module.close();
+    await disconnect();
+  })
 });
