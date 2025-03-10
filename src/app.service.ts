@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
+  getAppStatus(): string {
     return 'Chizek API is Live!';
   }
 }
