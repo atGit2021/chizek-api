@@ -16,7 +16,7 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Chizek API is Live!"', () => {
-      expect(appController.getHello()).toBe('Chizek API is Live!');
+      expect(appController.getAppStatus()).toBe('Chizek API is Live!');
     });
   });
 });
