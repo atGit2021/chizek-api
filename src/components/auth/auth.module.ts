@@ -15,12 +15,12 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         secret: configService.getOrThrow('JWT_SECRET'),
         signOptions: {
           expiresIn: Number(configService.getOrThrow('JWT_EXPIRATION')),
-        } 
+        },
       }),
       inject: [ConfigService],
-    })
+    }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
 export class AuthModule {}
