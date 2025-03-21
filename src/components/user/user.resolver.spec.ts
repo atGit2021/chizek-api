@@ -4,7 +4,6 @@ import { UserModule } from './user.module';
 import { MockDatabaseModule } from 'src/common/database/mock-database.module';
 import { disconnect } from 'mongoose';
 
-
 describe('UserResolver', () => {
   let module: TestingModule;
   let resolver: UserResolver;
@@ -24,5 +23,5 @@ describe('UserResolver', () => {
   afterAll(async () => {
     await module.close();
     await disconnect();
-  })
+  });
 });
