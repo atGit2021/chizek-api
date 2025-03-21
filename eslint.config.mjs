@@ -2,7 +2,7 @@ import globals from 'globals';
 import pluginJs from '@eslint/js';
 import typescriptParser from '@typescript-eslint/parser';
 import eslintPluginTypescript from '@typescript-eslint/eslint-plugin';
-import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
 import eslintPluginJest from 'eslint-plugin-jest';
 
 /** @type {import('eslint').Linter.Config[]} */
@@ -18,12 +18,13 @@ export default [
     },
     plugins: {
       '@typescript-eslint': eslintPluginTypescript,
-      'eslint-plugin-prettier': eslintPluginPrettier,
+      prettier: eslintPluginPrettier,
       jest: eslintPluginJest,
     },
     rules: {
       ...pluginJs.configs.recommended.rules,
       ...eslintPluginTypescript.configs.recommended.rules,
+      'prettier/prettier': ['error'],
     },
   },
   {
