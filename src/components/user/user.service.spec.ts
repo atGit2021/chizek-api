@@ -64,10 +64,10 @@ describe('UserService', () => {
       email: 'test@example.com',
       password: 'StrongP@ssword123',
     };
-  
-    jest.spyOn(userRepository, 'create').mockRejectedValue(
-      new Error('E11000 duplicate key error collection'),
-    );
+
+    jest
+      .spyOn(userRepository, 'create')
+      .mockRejectedValue(new Error('E11000 duplicate key error collection'));
 
     await expect(userService.create(createUserInput)).rejects.toThrow(
       UnprocessableEntityException,

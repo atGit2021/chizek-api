@@ -48,7 +48,7 @@ describe('AuthService', () => {
     const user: User = new User();
     user._id = new Types.ObjectId('507f1f77bcf86cd799439011');
     user.email = 'test@example.com';
-    user.password = 'test-password'
+    user.password = 'test-password';
 
     await service.login(user, mockResponse as Response);
 
@@ -57,10 +57,14 @@ describe('AuthService', () => {
       _id: user._id.toHexString(),
       email: 'test@example.com',
     });
-    expect(mockResponse.cookie).toHaveBeenCalledWith('Authentication', 'mock-token', expect.objectContaining({
-      httpOnly: true,
-      expires: expect.any(Date),
-    }));
+    expect(mockResponse.cookie).toHaveBeenCalledWith(
+      'Authentication',
+      'mock-token',
+      expect.objectContaining({
+        httpOnly: true,
+        expires: expect.any(Date),
+      }),
+    );
   });
 
   it('should logout a user and clear the cookie', () => {

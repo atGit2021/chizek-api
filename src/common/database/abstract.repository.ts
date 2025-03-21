@@ -5,7 +5,10 @@ import { AbstractEntity } from './abstract.entity';
 export abstract class AbstractRepository<T extends AbstractEntity> {
   protected readonly logger: Logger;
 
-  constructor(protected readonly model: Model<T>, logger: Logger) {
+  constructor(
+    protected readonly model: Model<T>,
+    logger: Logger,
+  ) {
     this.logger = logger;
   }
 
