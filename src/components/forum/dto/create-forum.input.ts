@@ -11,9 +11,6 @@ import {
 @InputType()
 export class CreateForumInput {
   @Field()
-  userId: string;
-
-  @Field()
   @Transform(({ value }) => value === 'true')
   @IsBoolean()
   isPrivate: boolean;
@@ -27,6 +24,7 @@ export class CreateForumInput {
 
   @Field({ nullable: true })
   @IsNotEmpty()
+  @IsString()
   @IsOptional()
   name?: string;
 }
