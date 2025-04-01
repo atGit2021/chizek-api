@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateForumInput } from './dto/create-forum.input';
 import { UpdateForumInput } from './dto/update-forum.input';
 import { ForumRepository } from './forum.repository';
+import { ForumFilterInput } from './dto/forum-filter.input';
 
 @Injectable()
 export class ForumService {
@@ -14,20 +15,23 @@ export class ForumService {
       userIds: createForumInput.userIds || [],
     });
   }
-
-  findAll() {
-    return `This action returns all forum`;
+  async findAll() {
+    return this.forumRepository.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} forum`;
+  async findOne(id: string) {
+    return this.forumRepository.findOne({ _id: id });
   }
 
-  update(id: number, updateForumInput: UpdateForumInput) {
-    return `This action updates a #${id} forum with ${updateForumInput}`;
+  update(id: string, updateForumInput: UpdateForumInput) {
+    return this.forumRepository.findOneAndUpdate({ _id: id }, updateForumInput);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} forum`;
+  remove(id: string) {
+    return this.forumRepository.findOneAndDelete({ _id: id });
+  }
+
+  async findByFilterQuery(query: { filterQuery?: ForumFilterInput } = {}) {
+    return this.forumRepository.find(query.filterQuery || {});
   }
 }
