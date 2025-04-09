@@ -1,73 +1,206 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Chizek API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS-based GraphQL API for the Chizek application, providing forum and chat functionality.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- GraphQL API with Apollo Server
+- MongoDB integration with Mongoose
+- Authentication using JWT
+- Forum functionality
+- Real-time AI integrated chat (coming soon)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Prerequisites
+
+### System Requirements
+
+- Node.js (v18 or higher)
+- MongoDB (v6.0 or higher)
+- Yarn package manager
+
+### Core Dependencies
+
+- TypeScript (^5.7.3)
+- NestJS CLI (^11.0.0)
+- NestJS Core (^11.0.6)
+- GraphQL (^16.10.0)
+- Apollo Server (^4.11.3)
+- Mongoose (^8.9.4)
+- MongoDB Driver (^6.12.0)
+
+### Authentication & Security
+
+- Passport (^0.7.0)
+- JWT (^11.0.0)
+- bcrypt (^5.1.1)
+
+### Validation & Transformation
+
+- class-validator (^0.14.1)
+- class-transformer (^0.5.1)
+
+### Logging & Monitoring
+
+- nestjs-pino (^4.2.0)
+- pino-http (^10.4.0)
+
+### Global Package Installation
+
+Install these packages globally:
+
+```bash
+# Install NestJS CLI
+yarn global add @nestjs/cli@11.0.0
+
+# Install TypeScript
+yarn global add typescript@5.7.3
+```
+
+### Development Tools
+
+For the best development experience, ensure your IDE has the following:
+
+- TypeScript support
+- ESLint integration (^9.22.0)
+- Prettier integration (^3.5.3)
+- GraphQL extension
+
+Recommended VS Code extensions:
+
+- ESLint
+- Prettier
+- GraphQL
 
 ## Installation
 
-```bash
-$ npm install
-```
-
-## Running the app
+1. Clone the repository:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone https://github.com/yourusername/chizek-api.git
+cd chizek-api
 ```
 
-## Test
+2. Install dependencies:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+yarn install
 ```
 
-## Support
+3. Create a `.env` file in the root directory with the following variables:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```env
+DB_NAME=your_db_name
+MONGODB_URI=mongodb://your_db_url
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRATION=your_duration
+```
 
-## Stay in touch
+## Running the Database
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Start MongoDB locally:
 
-## License
+```bash
+mongod --dbpath=databases/mongo/data
+```
 
-Nest is [MIT licensed](LICENSE).
+## Running the Application
+
+```bash
+# Development mode
+yarn start:dev
+
+# Production build
+yarn build
+yarn start:prod
+
+# Debug mode
+yarn start:debug
+```
+
+## Testing
+
+```bash
+# Unit tests
+yarn test
+
+# E2E tests
+yarn test:e2e
+
+# Test coverage
+yarn test:cov
+```
+
+### Test Configuration
+
+- Jest configuration in `jest.config.ts`
+- E2E tests in `test` directory
+- Coverage reports in `coverage` directory
+
+## Code Style and Linting
+
+### ESLint Configuration
+
+- Configuration file: `eslint.config.mjs`
+- TypeScript-specific rules enabled
+- Prettier integration
+
+### Prettier Configuration
+
+- Configuration file: `.prettierrc`
+- Consistent code formatting across the project
+
+## Error Handling
+
+The API uses standard HTTP status codes and GraphQL errors:
+
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 500: Internal Server Error
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow the established code style
+- Write tests for new features
+- Update documentation as needed
+- Use meaningful commit messages
+
+## Deployment
+
+### Production Build
+
+```bash
+yarn build
+yarn start:prod
+```
+
+### Production Requirements
+
+- Node.js production environment
+- MongoDB instance
+- Environment variables properly configured
+- Sufficient memory and CPU resources
+
+## Troubleshooting
+
+Common issues and solutions:
+
+1. MongoDB connection issues:
+
+   - Verify MongoDB is running
+   - Check connection string
+   - Ensure correct credentials
+
+2. GraphQL endpoint issues:
+   - Check Apollo Server configuration
+   - Verify schema generation
+   - Check resolver implementations
