@@ -15,8 +15,15 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await app.close();
+  });
+
+  afterAll(async () => {
+    // Ensure everything is closed
+    await app?.close();
+    // Add a small delay to allow handles to close
+    await new Promise((resolve) => setTimeout(resolve, 500));
   });
 
   it('/ (GET)', () => {

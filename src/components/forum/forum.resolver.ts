@@ -30,8 +30,8 @@ export class ForumResolver {
 
   @UseGuards(GqlAuthGuard)
   @Query(() => Forum, { name: 'forum' })
-  findOne(@Args('id', { type: () => String }) id: string) {
-    return this.forumService.findOne(id);
+  findOne(@Args('_id') _id: string) {
+    return this.forumService.findOne(_id);
   }
 
   @UseGuards(GqlAuthGuard)
