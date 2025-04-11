@@ -19,8 +19,8 @@ export class ForumService {
     return this.forumRepository.find({});
   }
 
-  async findOne(id: string) {
-    return this.forumRepository.findOne({ _id: id });
+  async findOne(_id: string) {
+    return this.forumRepository.findOne({ _id: _id });
   }
 
   update(id: string, updateForumInput: UpdateForumInput) {
