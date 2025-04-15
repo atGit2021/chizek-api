@@ -23,7 +23,7 @@ export class MessageService {
       {
         _id: forumId,
         $or: [
-          { ownerId },
+          { userId: ownerId },
           {
             userIds: {
               $in: [ownerId],
