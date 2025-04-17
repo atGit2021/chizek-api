@@ -22,7 +22,6 @@ export class Forum extends AbstractEntity {
   @Prop()
   name?: string;
 
-  @Field(() => [Message])
   @Prop([Message])
   messages: Message[];
 }
