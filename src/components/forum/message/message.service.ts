@@ -3,6 +3,7 @@ import { ForumRepository } from '../forum.repository';
 import { CreateMessageInput } from './dto/create-message.input';
 import { Message } from './entities/message.entity';
 import { Types } from 'mongoose';
+import { GetMessagesArgs } from './dto/get-messages.args';
 
 @Injectable()
 export class MessageService {
@@ -22,14 +23,7 @@ export class MessageService {
     await this.forumRepository.findOneAndUpdate(
       {
         _id: forumId,
-        $or: [
-          { userId: ownerId },
-          {
-            userIds: {
-              $in: [ownerId],
-            },
-          },
-        ],
+        ...this.userForumFilter(ownerId),
       },
       {
         $push: {
@@ -38,5 +32,27 @@ export class MessageService {
       },
     );
     return message;
+  }
+
+  private userForumFilter(userId: string) {
+    return {
+      $or: [
+        { userId },
+        {
+          userIds: {
+            $in: [userId],
+          },
+        },
+      ],
+    };
+  }
+
+  async getMessages({ forumId }: GetMessagesArgs, userId: string) {
+    return (
+      await this.forumRepository.findOne({
+        _id: forumId,
+        ...this.userForumFilter(userId),
+      })
+    ).messages;
   }
 }
