@@ -10,6 +10,7 @@ import { UserModule } from './components/user/user.module';
 import { LoggerModule } from 'nestjs-pino';
 import { AuthModule } from './components/auth/auth.module';
 import { ForumModule } from './components/forum/forum.module';
+import { MessageModule } from './components/forum/message/message.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ForumModule } from './components/forum/forum.module';
     UserModule,
     AuthModule,
     ForumModule,
+    MessageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

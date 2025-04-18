@@ -13,6 +13,7 @@ export class ForumService {
       ...createForumInput,
       userId,
       userIds: createForumInput.userIds || [],
+      messages: [],
     });
   }
   async findAll() {
