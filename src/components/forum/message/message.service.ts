@@ -4,6 +4,7 @@ import { CreateMessageInput } from './dto/create-message.input';
 import { Message } from './entities/message.entity';
 import { Types } from 'mongoose';
 import { GetMessagesArgs } from './dto/get-messages.args';
+import { toObjectId } from '../../../common/database/utils/mongo.utils';
 
 @Injectable()
 export class MessageService {
@@ -22,7 +23,7 @@ export class MessageService {
 
     await this.forumRepository.findOneAndUpdate(
       {
-        _id: forumId,
+        _id: toObjectId(forumId),
         ...this.userForumFilter(ownerId),
       },
       {
@@ -50,7 +51,7 @@ export class MessageService {
   async getMessages({ forumId }: GetMessagesArgs, userId: string) {
     return (
       await this.forumRepository.findOne({
-        _id: forumId,
+        _id: toObjectId(forumId),
         ...this.userForumFilter(userId),
       })
     ).messages;
