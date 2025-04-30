@@ -11,6 +11,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { AuthModule } from './components/auth/auth.module';
 import { ForumModule } from './components/forum/forum.module';
 import { MessageModule } from './components/forum/message/message.module';
+import { PubSubModule } from './common/pubsub/pubsub.module';
 
 @Module({
   imports: [
@@ -23,6 +24,9 @@ import { MessageModule } from './components/forum/message/message.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      subscriptions: {
+        'graphql-ws': true,
+      },
     }),
     DatabaseModule,
     LoggerModule.forRootAsync({
@@ -49,6 +53,7 @@ import { MessageModule } from './components/forum/message/message.module';
     AuthModule,
     ForumModule,
     MessageModule,
+    PubSubModule,
   ],
   controllers: [AppController],
   providers: [AppService],

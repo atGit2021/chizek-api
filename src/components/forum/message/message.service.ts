@@ -1,14 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ForumRepository } from '../forum.repository';
 import { CreateMessageInput } from './dto/create-message.input';
 import { Message } from './entities/message.entity';
 import { Types } from 'mongoose';
 import { GetMessagesArgs } from './dto/get-messages.args';
 import { toObjectId } from '../../../common/database/utils/mongo.utils';
+import { PUB_SUB } from 'src/common/constants/injection-tokens';
+import { PubSub } from 'graphql-subscriptions';
+import { MESSAGE_CREATED } from './constants/pubsub-triggers';
 
 @Injectable()
 export class MessageService {
-  constructor(private readonly forumRepository: ForumRepository) {}
+  constructor(
+    private readonly forumRepository: ForumRepository,
+    @Inject(PUB_SUB) private readonly pubSub: PubSub,
+  ) {}
 
   async createMessage(
     { content, forumId }: CreateMessageInput,
@@ -18,6 +24,7 @@ export class MessageService {
       _id: new Types.ObjectId(),
       content,
       ownerId,
+      forumId,
       createdAt: new Date(),
     };
 
@@ -32,6 +39,9 @@ export class MessageService {
         },
       },
     );
+    await this.pubSub.publish(MESSAGE_CREATED, {
+      messageCreated: message,
+    });
     return message;
   }
 
