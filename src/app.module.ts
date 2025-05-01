@@ -15,7 +15,6 @@ import { PubSubModule } from './common/pubsub/pubsub.module';
 import { AuthService } from './components/auth/auth.service';
 import { Request } from 'express';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
