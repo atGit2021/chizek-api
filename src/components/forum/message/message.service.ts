@@ -42,6 +42,7 @@ export class MessageService {
         },
       },
     );
+      
     await this.pubSub.publish(MESSAGE_CREATED, {
       messageCreated: message,
     });

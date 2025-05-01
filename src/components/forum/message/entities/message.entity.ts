@@ -16,7 +16,7 @@ export class Message extends AbstractEntity {
   @Field()
   @Prop()
   ownerId: string;
-
+  
   @Field()
   @Prop()
   forumId: string;
