@@ -1,13 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ForumRepository } from '../forum.repository';
 import { CreateMessageInput } from './dto/create-message.input';
 import { Message } from './entities/message.entity';
 import { Types } from 'mongoose';
 import { GetMessagesArgs } from './dto/get-messages.args';
+import { toObjectId } from '../../../common/database/utils/mongo.utils';
+import { PUB_SUB } from 'src/common/constants/injection-tokens';
+import { PubSub } from 'graphql-subscriptions';
+import { MESSAGE_CREATED } from './constants/pubsub-triggers';
+import { MessageCreatedArgs } from './dto/message-created.args';
+import { ForumService } from '../forum.service';
 
 @Injectable()
 export class MessageService {
-  constructor(private readonly forumRepository: ForumRepository) {}
+  constructor(
+    private readonly forumRepository: ForumRepository,
+    private readonly forumService: ForumService,
+    @Inject(PUB_SUB) private readonly pubSub: PubSub,
+  ) {}
 
   async createMessage(
     { content, forumId }: CreateMessageInput,
@@ -17,13 +27,14 @@ export class MessageService {
       _id: new Types.ObjectId(),
       content,
       ownerId,
+      forumId,
       createdAt: new Date(),
     };
 
     await this.forumRepository.findOneAndUpdate(
       {
-        _id: forumId,
-        ...this.userForumFilter(ownerId),
+        _id: toObjectId(forumId),
+        ...this.forumService.userForumFilter(ownerId),
       },
       {
         $push: {
@@ -31,28 +42,27 @@ export class MessageService {
         },
       },
     );
+      
+    await this.pubSub.publish(MESSAGE_CREATED, {
+      messageCreated: message,
+    });
     return message;
-  }
-
-  private userForumFilter(userId: string) {
-    return {
-      $or: [
-        { userId },
-        {
-          userIds: {
-            $in: [userId],
-          },
-        },
-      ],
-    };
   }
 
   async getMessages({ forumId }: GetMessagesArgs, userId: string) {
     return (
       await this.forumRepository.findOne({
-        _id: forumId,
-        ...this.userForumFilter(userId),
+        _id: toObjectId(forumId),
+        ...this.forumService.userForumFilter(userId),
       })
     ).messages;
+  }
+
+  async messageCreated({ forumId }: MessageCreatedArgs, userId: string) {
+    await this.forumRepository.findOne({
+      _id: toObjectId(forumId),
+      ...this.forumService.userForumFilter(userId),
+    });
+    return this.pubSub.asyncIterableIterator(MESSAGE_CREATED);
   }
 }

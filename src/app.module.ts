@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module, UnauthorizedException } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,6 +11,10 @@ import { LoggerModule } from 'nestjs-pino';
 import { AuthModule } from './components/auth/auth.module';
 import { ForumModule } from './components/forum/forum.module';
 import { MessageModule } from './components/forum/message/message.module';
+import { PubSubModule } from './common/pubsub/pubsub.module';
+import { AuthService } from './components/auth/auth.service';
+import { Request } from 'express';
+
 
 @Module({
   imports: [
@@ -20,9 +24,28 @@ import { MessageModule } from './components/forum/message/message.module';
         MONGODB_URI: Joi.string().required(),
       }),
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: true,
+      useFactory: (authService: AuthService) => ({
+        autoSchemaFile: true,
+        subscriptions: {
+          'graphql-ws': {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onConnect: (context: any) => {
+              try {
+                const request: Request = context.extra.request;
+                const user = authService.verifyWs(request);
+                context.user = user;
+              } catch (err) {
+                new Logger().error(err);
+                throw new UnauthorizedException();
+              }
+            },
+          },
+        },
+      }),
+      imports: [AuthModule],
+      inject: [AuthService],
     }),
     DatabaseModule,
     LoggerModule.forRootAsync({
@@ -49,6 +72,7 @@ import { MessageModule } from './components/forum/message/message.module';
     AuthModule,
     ForumModule,
     MessageModule,
+    PubSubModule,
   ],
   controllers: [AppController],
   providers: [AppService],
