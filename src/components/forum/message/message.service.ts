@@ -8,11 +8,14 @@ import { toObjectId } from '../../../common/database/utils/mongo.utils';
 import { PUB_SUB } from 'src/common/constants/injection-tokens';
 import { PubSub } from 'graphql-subscriptions';
 import { MESSAGE_CREATED } from './constants/pubsub-triggers';
+import { MessageCreatedArgs } from './dto/message-created.args';
+import { ForumService } from '../forum.service';
 
 @Injectable()
 export class MessageService {
   constructor(
     private readonly forumRepository: ForumRepository,
+    private readonly forumService: ForumService,
     @Inject(PUB_SUB) private readonly pubSub: PubSub,
   ) {}
 
@@ -31,7 +34,7 @@ export class MessageService {
     await this.forumRepository.findOneAndUpdate(
       {
         _id: toObjectId(forumId),
-        ...this.userForumFilter(ownerId),
+        ...this.forumService.userForumFilter(ownerId),
       },
       {
         $push: {
@@ -45,25 +48,20 @@ export class MessageService {
     return message;
   }
 
-  private userForumFilter(userId: string) {
-    return {
-      $or: [
-        { userId },
-        {
-          userIds: {
-            $in: [userId],
-          },
-        },
-      ],
-    };
-  }
-
   async getMessages({ forumId }: GetMessagesArgs, userId: string) {
     return (
       await this.forumRepository.findOne({
         _id: toObjectId(forumId),
-        ...this.userForumFilter(userId),
+        ...this.forumService.userForumFilter(userId),
       })
     ).messages;
+  }
+
+  async messageCreated({ forumId }: MessageCreatedArgs, userId: string) {
+    await this.forumRepository.findOne({
+      _id: toObjectId(forumId),
+      ...this.forumService.userForumFilter(userId),
+    });
+    return this.pubSub.asyncIterableIterator(MESSAGE_CREATED);
   }
 }

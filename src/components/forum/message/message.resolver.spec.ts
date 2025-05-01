@@ -5,6 +5,7 @@ import { CreateMessageInput } from './dto/create-message.input';
 import { Message } from './entities/message.entity';
 import { Types } from 'mongoose';
 import { GetMessagesArgs } from './dto/get-messages.args';
+import { PUB_SUB } from 'src/common/constants/injection-tokens';
 
 describe('MessageResolver', () => {
   let resolver: MessageResolver;
@@ -15,6 +16,11 @@ describe('MessageResolver', () => {
     getMessages: jest.fn(),
   };
 
+  const mockPubSub = {
+    publish: jest.fn(),
+    asyncIterator: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -22,6 +28,10 @@ describe('MessageResolver', () => {
         {
           provide: MessageService,
           useValue: mockMessageService,
+        },
+        {
+          provide: PUB_SUB,
+          useValue: mockPubSub,
         },
       ],
     }).compile();
@@ -47,6 +57,7 @@ describe('MessageResolver', () => {
         content: input.content,
         ownerId: user._id,
         createdAt: new Date(),
+        forumId: input.forumId,
       };
 
       mockMessageService.createMessage.mockResolvedValue(expectedMessage);
@@ -74,12 +85,14 @@ describe('MessageResolver', () => {
           content: 'First message',
           ownerId: user._id,
           createdAt: new Date(),
+          forumId: args.forumId,
         },
         {
           _id: new Types.ObjectId(),
           content: 'Second message',
           ownerId: user._id,
           createdAt: new Date(),
+          forumId: args.forumId,
         },
       ];
 

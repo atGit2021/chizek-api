@@ -17,8 +17,10 @@ export class ForumService {
       messages: [],
     });
   }
-  async findAll() {
-    return this.forumRepository.find({});
+  async findAll(userId: string) {
+    return this.forumRepository.find({
+      ...this.userForumFilter(userId),
+    });
   }
 
   async findOne(_id: string) {
@@ -38,5 +40,19 @@ export class ForumService {
 
   async findByFilterQuery(query: { filterQuery?: ForumFilterInput } = {}) {
     return this.forumRepository.find(query.filterQuery || {});
+  }
+
+  userForumFilter(userId: string) {
+    return {
+      $or: [
+        { userId },
+        {
+          userIds: {
+            $in: [userId],
+          },
+        },
+        { isPrivate: false },
+      ],
+    };
   }
 }
