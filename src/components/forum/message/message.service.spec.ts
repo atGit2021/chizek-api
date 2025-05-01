@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MessageService } from './message.service';
 import { ForumRepository } from '../forum.repository';
+import { ForumService } from '../forum.service';
+import { PUB_SUB } from 'src/common/constants/injection-tokens';
 
 describe('MessageService', () => {
   let service: MessageService;
@@ -10,6 +12,15 @@ describe('MessageService', () => {
     findOne: jest.fn(),
   };
 
+  const mockForumService = {
+    userForumFilter: jest.fn().mockReturnValue({}),
+  };
+
+  const mockPubSub = {
+    publish: jest.fn(),
+    asyncIterableIterator: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -17,6 +28,14 @@ describe('MessageService', () => {
         {
           provide: ForumRepository,
           useValue: mockForumRepository,
+        },
+        {
+          provide: ForumService,
+          useValue: mockForumService,
+        },
+        {
+          provide: PUB_SUB,
+          useValue: mockPubSub,
         },
       ],
     }).compile();

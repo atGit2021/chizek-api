@@ -24,8 +24,8 @@ export class ForumResolver {
 
   @UseGuards(GqlAuthGuard)
   @Query(() => [Forum], { name: 'forums' })
-  findAll() {
-    return this.forumService.findAll();
+  findAll(@CurrentUser() user: TokenPayload) {
+    return this.forumService.findAll(user._id);
   }
 
   @UseGuards(GqlAuthGuard)

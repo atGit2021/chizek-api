@@ -12,6 +12,6 @@ import { MessageModule } from './message/message.module';
     forwardRef(() => MessageModule),
   ],
   providers: [ForumResolver, ForumService, ForumRepository, Logger],
-  exports: [ForumRepository],
+  exports: [ForumRepository, ForumService],
 })
 export class ForumModule {}
