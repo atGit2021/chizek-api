@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '../user/entities/user.entity';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -32,12 +32,26 @@ export class AuthService {
   }
 
   verifyWs(request: Request): TokenPayload {
-    const cookies: string[] = request.headers.cookie.split('; ');
+    const cookies: string[] = request.headers.cookie?.split('; ') || [];
     const authCookie = cookies.find((cookie) =>
       cookie.includes('Authentication'),
     );
+    if (!authCookie) {
+      throw new UnauthorizedException('Authentication cookie not found');
+    }
+
     const jwt = authCookie.split('Authentication=')[1];
-    return this.jwtService.verify(jwt);
+    if (!jwt) {
+      throw new UnauthorizedException(
+        'Token is missing in the Authentication cookie',
+      );
+    }
+
+    try {
+      return this.jwtService.verify<TokenPayload>(jwt);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 
   logout(response: Response) {
