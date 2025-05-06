@@ -13,7 +13,6 @@ export class ForumService {
     return this.forumRepository.create({
       ...createForumInput,
       userId,
-      userIds: createForumInput.userIds || [],
       messages: [],
     });
   }
