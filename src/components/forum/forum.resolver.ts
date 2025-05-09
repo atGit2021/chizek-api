@@ -15,43 +15,45 @@ export class ForumResolver {
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Forum)
-  createForum(
+  async createForum(
     @Args('createForumInput') createForumInput: CreateForumInput,
     @CurrentUser() user: TokenPayload,
-  ) {
+  ): Promise<Forum> {
     return this.forumService.create(createForumInput, user._id);
   }
 
   @UseGuards(GqlAuthGuard)
   @Query(() => [Forum], { name: 'forums' })
-  findAll(@CurrentUser() user: TokenPayload) {
-    return this.forumService.findAll(user._id);
+  async findAll(): Promise<Forum[]> {
+    return this.forumService.findAll();
   }
 
   @UseGuards(GqlAuthGuard)
   @Query(() => Forum, { name: 'forum' })
-  findOne(@Args('_id') _id: string) {
+  async findOne(@Args('_id') _id: string): Promise<Forum> {
     return this.forumService.findOne(_id);
   }
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Forum)
-  updateForum(@Args('updateForumInput') updateForumInput: UpdateForumInput) {
+  async updateForum(
+    @Args('updateForumInput') updateForumInput: UpdateForumInput,
+  ): Promise<Forum> {
     return this.forumService.update(updateForumInput.id, updateForumInput);
   }
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Forum)
-  removeForum(@Args('id', { type: () => String }) id: string) {
+  async removeForum(@Args('id', { type: () => String }) id: string) {
     return this.forumService.remove(id);
   }
 
   @UseGuards(GqlAuthGuard)
   @Query(() => [Forum], { name: 'findForums' })
-  findForums(
+  async findForums(
     @Args('filterQuery', { type: () => ForumFilterInput, nullable: true })
     filterQuery?: ForumFilterInput,
-  ) {
+  ): Promise<Forum[]> {
     return this.forumService.findByFilterQuery({ filterQuery });
   }
 }

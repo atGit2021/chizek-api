@@ -14,6 +14,6 @@ import { ForumDocument, ForumSchema } from './entities/forum.document';
     forwardRef(() => MessageModule),
   ],
   providers: [ForumResolver, ForumService, ForumRepository, Logger],
-  exports: [ForumRepository, ForumService],
+  exports: [ForumRepository],
 })
 export class ForumModule {}

@@ -5,19 +5,17 @@ import { Message } from './entities/message.entity';
 import { Types } from 'mongoose';
 import { GetMessagesArgs } from './dto/get-messages.args';
 import { toObjectId } from '../../../common/database/utils/mongo.utils';
-import { PUB_SUB } from 'src/common/constants/injection-tokens';
+import { PUB_SUB } from '../../../common/constants/injection-tokens';
 import { PubSub } from 'graphql-subscriptions';
 import { MESSAGE_CREATED } from './constants/pubsub-triggers';
 import { MessageCreatedArgs } from './dto/message-created.args';
-import { ForumService } from '../forum.service';
 import { MessageDocument } from './entities/message.document';
-import { UserService } from 'src/components/user/user.service';
+import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class MessageService {
   constructor(
     private readonly forumRepository: ForumRepository,
-    private readonly forumService: ForumService,
     private readonly userService: UserService,
     @Inject(PUB_SUB) private readonly pubSub: PubSub,
   ) {}
@@ -36,7 +34,6 @@ export class MessageService {
     await this.forumRepository.findOneAndUpdate(
       {
         _id: toObjectId(forumId),
-        ...this.forumService.userForumFilter(ownerId),
       },
       {
         $push: {
@@ -56,19 +53,28 @@ export class MessageService {
     return message;
   }
 
-  async getMessages({ forumId }: GetMessagesArgs, userId: string) {
-    return (
-      await this.forumRepository.findOne({
-        _id: toObjectId(forumId),
-        ...this.forumService.userForumFilter(userId),
-      })
-    ).messages;
+  async getMessages({ forumId }: GetMessagesArgs) {
+    return this.forumRepository.model.aggregate([
+      { $match: { _id: new Types.ObjectId(forumId) } },
+      { $unwind: '$messages' },
+      { $replaceRoot: { newRoot: '$messages' } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'ownerId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      { $unset: 'ownerId' },
+      { $set: { forumId } },
+    ]);
   }
 
-  async messageCreated({ forumId }: MessageCreatedArgs, userId: string) {
+  async messageCreated({ forumId }: MessageCreatedArgs) {
     await this.forumRepository.findOne({
       _id: toObjectId(forumId),
-      ...this.forumService.userForumFilter(userId),
     });
     return this.pubSub.asyncIterableIterator(MESSAGE_CREATED);
   }
