@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateForumInput } from './dto/create-forum.input';
 import { UpdateForumInput } from './dto/update-forum.input';
 import { ForumRepository } from './forum.repository';
 import { ForumFilterInput } from './dto/forum-filter.input';
 import { toObjectId } from '../../common/database/utils/mongo.utils';
+import { PipelineStage, Types } from 'mongoose';
+import { Forum } from './entities/forum.entity';
 
 @Injectable()
 export class ForumService {
@@ -20,8 +22,40 @@ export class ForumService {
     return this.forumRepository.find({});
   }
 
-  async findOne(_id: string) {
-    return this.forumRepository.findOne({ _id: toObjectId(_id) });
+  async findForums(prePipelineStages: PipelineStage[] = []): Promise<Forum[]> {
+    const forums = await this.forumRepository.model.aggregate([
+      ...prePipelineStages,
+      { $set: { latestMessage: { $arrayElemAt: ['$messages', -1] } } },
+      { $unset: 'messages' },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'latestMessage.userId',
+          foreignField: '_id',
+          as: 'latestMessage.user',
+        },
+      },
+    ]);
+    forums.forEach((forum) => {
+      if (!forum.latestMessage?._id) {
+        delete forum.latestMessage;
+        return;
+      }
+      forum.latestMessage.user = forum.latestMessage.user[0];
+      delete forum.latestMessage.userId;
+      forum.latestMessage.forumId = forum._id;
+    });
+    return forums;
+  }
+
+  async findOne(_id: string): Promise<Forum> {
+    const forums = await this.findForums([
+      { $match: { forumId: new Types.ObjectId(_id) } },
+    ]);
+    if (!forums[0]) {
+      throw new NotFoundException(`No forum found with ID ${_id}`);
+    }
+    return forums[0];
   }
 
   async update(id: string, updateForumInput: UpdateForumInput) {
@@ -38,20 +72,4 @@ export class ForumService {
   async findByFilterQuery(query: { filterQuery?: ForumFilterInput } = {}) {
     return this.forumRepository.find(query.filterQuery || {});
   }
-
-  /* TODO: private forums
-  UserForumFilter(userId: string) {
-    return {
-      $or: [
-        { userId },
-        {
-          userIds: {
-            $in: [userId],
-          },
-        },
-        { isPrivate: false },
-      ],
-    };
-  }
-    */
 }
