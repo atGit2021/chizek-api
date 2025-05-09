@@ -10,12 +10,15 @@ import { PubSub } from 'graphql-subscriptions';
 import { MESSAGE_CREATED } from './constants/pubsub-triggers';
 import { MessageCreatedArgs } from './dto/message-created.args';
 import { ForumService } from '../forum.service';
+import { MessageDocument } from './entities/message.document';
+import { UserService } from 'src/components/user/user.service';
 
 @Injectable()
 export class MessageService {
   constructor(
     private readonly forumRepository: ForumRepository,
     private readonly forumService: ForumService,
+    private readonly userService: UserService,
     @Inject(PUB_SUB) private readonly pubSub: PubSub,
   ) {}
 
@@ -23,11 +26,10 @@ export class MessageService {
     { content, forumId }: CreateMessageInput,
     ownerId: string,
   ) {
-    const message: Message = {
+    const messageDocument: MessageDocument = {
       _id: new Types.ObjectId(),
       content,
-      ownerId,
-      forumId,
+      ownerId: new Types.ObjectId(ownerId),
       createdAt: new Date(),
     };
 
@@ -38,11 +40,16 @@ export class MessageService {
       },
       {
         $push: {
-          messages: message,
+          messages: messageDocument,
         },
       },
     );
 
+    const message: Message = {
+      ...messageDocument,
+      forumId,
+      user: await this.userService.findOne(ownerId),
+    };
     await this.pubSub.publish(MESSAGE_CREATED, {
       messageCreated: message,
     });
