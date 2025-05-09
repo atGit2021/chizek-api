@@ -7,7 +7,6 @@ import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { TokenPayload } from '../auth/token-payload.interface';
-import { ForumFilterInput } from './dto/forum-filter.input';
 
 @Resolver(() => Forum)
 export class ForumResolver {
@@ -29,6 +28,12 @@ export class ForumResolver {
   }
 
   @UseGuards(GqlAuthGuard)
+  @Query(() => [Forum], { name: 'findForums' })
+  async findForums(): Promise<Forum[]> {
+    return this.forumService.findForums();
+  }
+
+  @UseGuards(GqlAuthGuard)
   @Query(() => Forum, { name: 'forum' })
   async findOne(@Args('_id') _id: string): Promise<Forum> {
     return this.forumService.findOne(_id);
@@ -46,14 +51,5 @@ export class ForumResolver {
   @Mutation(() => Forum)
   async removeForum(@Args('id', { type: () => String }) id: string) {
     return this.forumService.remove(id);
-  }
-
-  @UseGuards(GqlAuthGuard)
-  @Query(() => [Forum], { name: 'findForums' })
-  async findForums(
-    @Args('filterQuery', { type: () => ForumFilterInput, nullable: true })
-    filterQuery?: ForumFilterInput,
-  ): Promise<Forum[]> {
-    return this.forumService.findByFilterQuery({ filterQuery });
   }
 }

@@ -33,9 +33,10 @@ export class MessageResolver {
   @Subscription(() => Message, {
     filter: (payload, variables, context) => {
       const userId = context.req.user._id;
+      const message: Message = payload.messageCreated;
       return (
-        payload.messageCreated.forumId === variables.forumId &&
-        userId !== payload.messageCreated.userId
+        message.forumId === variables.forumId &&
+        userId !== message.user._id.toHexString()
       );
     },
   })
