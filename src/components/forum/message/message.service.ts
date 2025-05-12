@@ -27,7 +27,7 @@ export class MessageService {
     const messageDocument: MessageDocument = {
       _id: new Types.ObjectId(),
       content,
-      ownerId: new Types.ObjectId(ownerId),
+      ownerId: toObjectId(ownerId),
       createdAt: new Date(),
     };
 
@@ -55,7 +55,7 @@ export class MessageService {
 
   async getMessages({ forumId }: GetMessagesArgs) {
     return this.forumRepository.model.aggregate([
-      { $match: { _id: new Types.ObjectId(forumId) } },
+      { $match: { _id: toObjectId(forumId) } },
       { $unwind: '$messages' },
       { $replaceRoot: { newRoot: '$messages' } },
       {
