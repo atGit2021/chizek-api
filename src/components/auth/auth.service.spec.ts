@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { User } from '../user/entities/user.entity';
-import { Types } from 'mongoose';
+import { toObjectId } from '../../common/database/utils/mongo.utils';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -46,7 +46,7 @@ describe('AuthService', () => {
 
   it('should login a user and set a cookie', async () => {
     const user: User = new User();
-    user._id = new Types.ObjectId('507f1f77bcf86cd799439011');
+    user._id = toObjectId('507f1f77bcf86cd799439011');
     user.email = 'test@example.com';
     user.password = 'test-password';
 

@@ -4,7 +4,7 @@ import { UpdateForumInput } from './dto/update-forum.input';
 import { ForumRepository } from './forum.repository';
 import { ForumFilterInput } from './dto/forum-filter.input';
 import { toObjectId } from '../../common/database/utils/mongo.utils';
-import { PipelineStage, Types } from 'mongoose';
+import { PipelineStage } from 'mongoose';
 import { Forum } from './entities/forum.entity';
 
 @Injectable()
@@ -50,7 +50,7 @@ export class ForumService {
 
   async findOne(_id: string): Promise<Forum> {
     const forums = await this.findForums([
-      { $match: { _id: new Types.ObjectId(_id) } },
+      { $match: { _id: toObjectId(_id) } },
     ]);
     if (!forums[0]) {
       throw new NotFoundException(`No forum found with ID ${_id}`);
