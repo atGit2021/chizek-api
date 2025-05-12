@@ -2,28 +2,23 @@ import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { MessageService } from './message.service';
 import { Message } from './entities/message.entity';
 import { GqlAuthGuard } from '../../auth/guards/gql-auth.guard';
-import { Inject, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { CreateMessageInput } from './dto/create-message.input';
 import { CurrentUser } from 'src/components/auth/current-user.decorator';
 import { TokenPayload } from 'src/components/auth/token-payload.interface';
 import { GetMessagesArgs } from './dto/get-messages.args';
-import { PUB_SUB } from 'src/common/constants/injection-tokens';
-import { PubSub } from 'graphql-subscriptions';
 import { MessageCreatedArgs } from './dto/message-created.args';
 
 @Resolver(() => Message)
 export class MessageResolver {
-  constructor(
-    private readonly messageService: MessageService,
-    @Inject(PUB_SUB) private readonly pubSub: PubSub,
-  ) {}
+  constructor(private readonly messageService: MessageService) {}
 
   @Mutation(() => Message)
   @UseGuards(GqlAuthGuard)
   async createMessage(
     @Args('createMessageInput') createMessageInput: CreateMessageInput,
     @CurrentUser() user: TokenPayload,
-  ) {
+  ): Promise<Message> {
     return this.messageService.createMessage(createMessageInput, user._id);
   }
 
@@ -31,24 +26,21 @@ export class MessageResolver {
   @UseGuards(GqlAuthGuard)
   async getMessages(
     @Args() getMessageArgs: GetMessagesArgs,
-    @CurrentUser() user: TokenPayload,
-  ) {
-    return this.messageService.getMessages(getMessageArgs, user._id);
+  ): Promise<Message[]> {
+    return this.messageService.getMessages(getMessageArgs);
   }
 
   @Subscription(() => Message, {
     filter: (payload, variables, context) => {
       const userId = context.req.user._id;
+      const message: Message = payload.messageCreated;
       return (
-        payload.messageCreated.forumId === variables.forumId &&
-        userId !== payload.messageCreated.userId
+        message.forumId === variables.forumId &&
+        userId !== message.user._id.toHexString()
       );
     },
   })
-  messageCreated(
-    @Args() messageCreatedArgs: MessageCreatedArgs,
-    @CurrentUser() user: TokenPayload,
-  ) {
-    return this.messageService.messageCreated(messageCreatedArgs, user._id);
+  messageCreated(@Args() messageCreatedArgs: MessageCreatedArgs) {
+    return this.messageService.messageCreated(messageCreatedArgs);
   }
 }
