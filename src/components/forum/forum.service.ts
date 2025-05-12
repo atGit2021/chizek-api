@@ -50,7 +50,7 @@ export class ForumService {
 
   async findOne(_id: string): Promise<Forum> {
     const forums = await this.findForums([
-      { $match: { forumId: new Types.ObjectId(_id) } },
+      { $match: { _id: new Types.ObjectId(_id) } },
     ]);
     if (!forums[0]) {
       throw new NotFoundException(`No forum found with ID ${_id}`);
