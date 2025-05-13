@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateForumInput } from './dto/create-forum.input';
 import { UpdateForumInput } from './dto/update-forum.input';
 import { ForumRepository } from './forum.repository';
-import { ForumFilterInput } from './dto/forum-filter.input';
 import { toObjectId } from '../../common/database/utils/mongo.utils';
 import { PipelineStage } from 'mongoose';
 import { Forum } from './entities/forum.entity';
@@ -18,11 +17,8 @@ export class ForumService {
       messages: [],
     });
   }
-  async findAll() {
-    return this.forumRepository.find({});
-  }
 
-  async findForums(prePipelineStages: PipelineStage[] = []): Promise<Forum[]> {
+  async findAll(prePipelineStages: PipelineStage[] = []): Promise<Forum[]> {
     const forums = await this.forumRepository.model.aggregate([
       ...prePipelineStages,
       { $set: { latestMessage: { $arrayElemAt: ['$messages', -1] } } },
@@ -30,7 +26,7 @@ export class ForumService {
       {
         $lookup: {
           from: 'users',
-          localField: 'latestMessage.userId',
+          localField: 'latestMessage.ownerId',
           foreignField: '_id',
           as: 'latestMessage.user',
         },
@@ -49,9 +45,7 @@ export class ForumService {
   }
 
   async findOne(_id: string): Promise<Forum> {
-    const forums = await this.findForums([
-      { $match: { _id: toObjectId(_id) } },
-    ]);
+    const forums = await this.findAll([{ $match: { _id: toObjectId(_id) } }]);
     if (!forums[0]) {
       throw new NotFoundException(`No forum found with ID ${_id}`);
     }
@@ -67,9 +61,5 @@ export class ForumService {
 
   async remove(id: string) {
     return this.forumRepository.findOneAndDelete({ _id: toObjectId(id) });
-  }
-
-  async findByFilterQuery(query: { filterQuery?: ForumFilterInput } = {}) {
-    return this.forumRepository.find(query.filterQuery || {});
   }
 }

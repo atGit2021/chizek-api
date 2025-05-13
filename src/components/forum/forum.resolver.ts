@@ -28,12 +28,6 @@ export class ForumResolver {
   }
 
   @UseGuards(GqlAuthGuard)
-  @Query(() => [Forum], { name: 'findForums' })
-  async findForums(): Promise<Forum[]> {
-    return this.forumService.findForums();
-  }
-
-  @UseGuards(GqlAuthGuard)
   @Query(() => Forum, { name: 'forum' })
   async findOne(@Args('_id') _id: string): Promise<Forum> {
     return this.forumService.findOne(_id);
