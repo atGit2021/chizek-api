@@ -7,6 +7,10 @@ import { AbstractEntity } from '../../../common/database/abstract.entity';
 export class User extends AbstractEntity {
   @Prop()
   @Field()
+  username: string;
+
+  @Prop()
+  @Field()
   email: string;
 
   @Prop()
