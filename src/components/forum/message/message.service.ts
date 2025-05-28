@@ -8,7 +8,6 @@ import { toObjectId } from '../../../common/database/utils/mongo.utils';
 import { PUB_SUB } from '../../../common/constants/injection-tokens';
 import { PubSub } from 'graphql-subscriptions';
 import { MESSAGE_CREATED } from './constants/pubsub-triggers';
-import { MessageCreatedArgs } from './dto/message-created.args';
 import { MessageDocument } from './entities/message.document';
 import { UserService } from '../../user/user.service';
 
@@ -72,10 +71,7 @@ export class MessageService {
     ]);
   }
 
-  async messageCreated({ forumId }: MessageCreatedArgs) {
-    await this.forumRepository.findOne({
-      _id: toObjectId(forumId),
-    });
+  messageCreated() {
     return this.pubSub.asyncIterableIterator(MESSAGE_CREATED);
   }
 }
