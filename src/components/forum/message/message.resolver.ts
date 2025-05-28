@@ -31,16 +31,18 @@ export class MessageResolver {
   }
 
   @Subscription(() => Message, {
-    filter: (payload, variables, context) => {
+    filter: (payload, variables: MessageCreatedArgs, context) => {
       const userId = context.req.user._id;
       const message: Message = payload.messageCreated;
       return (
-        message.forumId === variables.forumId &&
+        variables.forumIds.includes(message.forumId) &&
         userId !== message.user._id.toHexString()
       );
     },
   })
-  messageCreated(@Args() messageCreatedArgs: MessageCreatedArgs) {
-    return this.messageService.messageCreated(messageCreatedArgs);
+  // Keep the MessageCreatedArgs type definition for graphql introspection
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  messageCreated(@Args() _messageCreatedArgs: MessageCreatedArgs) {
+    return this.messageService.messageCreated();
   }
 }
