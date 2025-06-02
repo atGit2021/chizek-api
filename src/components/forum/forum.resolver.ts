@@ -7,6 +7,7 @@ import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { TokenPayload } from '../auth/token-payload.interface';
+import { PaginationArgs } from '../../common/dto/pagination-args.dto';
 
 @Resolver(() => Forum)
 export class ForumResolver {
@@ -23,8 +24,8 @@ export class ForumResolver {
 
   @UseGuards(GqlAuthGuard)
   @Query(() => [Forum], { name: 'forums' })
-  async findAll(): Promise<Forum[]> {
-    return this.forumService.findAll();
+  async findAll(@Args() paginationArgs: PaginationArgs): Promise<Forum[]> {
+    return this.forumService.findAll([], paginationArgs);
   }
 
   @UseGuards(GqlAuthGuard)
