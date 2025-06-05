@@ -54,12 +54,14 @@ export class MessageService {
 
   async countMessages(forumId: string) {
     return (
-      await this.forumRepository.model.aggregate([
-        { $match: { _id: toObjectId(forumId) } },
-        { $unwind: '$messages' },
-        { $count: 'messages' },
-      ])
-    )[0];
+      (
+        await this.forumRepository.model.aggregate([
+          { $match: { _id: toObjectId(forumId) } },
+          { $unwind: '$messages' },
+          { $count: 'messageCount' },
+        ])
+      )[0]?.messageCount ?? 0
+    );
   }
 
   async getMessages({ forumId, limit, skip }: GetMessagesArgs) {
