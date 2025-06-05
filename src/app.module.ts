@@ -15,6 +15,7 @@ import { PubSubModule } from './common/pubsub/pubsub.module';
 import { AuthService } from './components/auth/auth.service';
 import { Request } from 'express';
 import { ForumsController } from './components/forum/forums.controller';
+import { MessageController } from './components/forum/message/message.controller';
 
 @Module({
   imports: [
@@ -74,7 +75,7 @@ import { ForumsController } from './components/forum/forums.controller';
     MessageModule,
     PubSubModule,
   ],
-  controllers: [AppController, ForumsController],
+  controllers: [AppController, ForumsController, MessageController],
   providers: [AppService],
 })
 export class AppModule {}
