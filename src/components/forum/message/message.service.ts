@@ -52,7 +52,7 @@ export class MessageService {
     return message;
   }
 
-  async countMessages(forumId: string) {
+  async countMessages(forumId: string): Promise<number> {
     return (
       (
         await this.forumRepository.model.aggregate([
