@@ -52,11 +52,26 @@ export class MessageService {
     return message;
   }
 
-  async getMessages({ forumId }: GetMessagesArgs) {
+  async countMessages(forumId: string): Promise<number> {
+    return (
+      (
+        await this.forumRepository.model.aggregate([
+          { $match: { _id: toObjectId(forumId) } },
+          { $unwind: '$messages' },
+          { $count: 'messageCount' },
+        ])
+      )[0]?.messageCount ?? 0
+    );
+  }
+
+  async getMessages({ forumId, limit, skip }: GetMessagesArgs) {
     return this.forumRepository.model.aggregate([
       { $match: { _id: toObjectId(forumId) } },
       { $unwind: '$messages' },
       { $replaceRoot: { newRoot: '$messages' } },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
       {
         $lookup: {
           from: 'users',
