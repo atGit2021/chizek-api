@@ -7,5 +7,6 @@ import { UserModule } from '../../user/user.module';
 @Module({
   imports: [forwardRef(() => ForumModule), UserModule],
   providers: [MessageResolver, MessageService],
+  exports: [MessageService],
 })
 export class MessageModule {}

@@ -5,6 +5,7 @@ import { ForumRepository } from './forum.repository';
 import { toObjectId } from '../../common/database/utils/mongo.utils';
 import { PipelineStage } from 'mongoose';
 import { Forum } from './entities/forum.entity';
+import { PaginationArgs } from '../../common/dto/pagination-args.dto';
 
 @Injectable()
 export class ForumService {
@@ -18,10 +19,26 @@ export class ForumService {
     });
   }
 
-  async findAll(prePipelineStages: PipelineStage[] = []): Promise<Forum[]> {
+  async findAll(
+    prePipelineStages: PipelineStage[] = [],
+    paginationArgs?: PaginationArgs,
+  ): Promise<Forum[]> {
     const forums = await this.forumRepository.model.aggregate([
       ...prePipelineStages,
-      { $set: { latestMessage: { $arrayElemAt: ['$messages', -1] } } },
+      {
+        $set: {
+          latestMessage: {
+            $cond: [
+              '$messages',
+              { $arrayElemAt: ['$messages', -1] },
+              { createdAt: new Date() },
+            ],
+          },
+        },
+      },
+      { $sort: { 'latestMessage.createdAt': -1 } },
+      { $skip: paginationArgs?.skip },
+      { $limit: paginationArgs?.limit },
       { $unset: 'messages' },
       {
         $lookup: {
@@ -42,6 +59,10 @@ export class ForumService {
       forum.latestMessage.forumId = forum._id;
     });
     return forums;
+  }
+
+  async countForums() {
+    return this.forumRepository.model.countDocuments({});
   }
 
   async findOne(_id: string): Promise<Forum> {
