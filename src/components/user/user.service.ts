@@ -7,10 +7,15 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UserRepository } from './user.repository';
+import { S3Service } from 'src/common/s3/s3.service';
+import { USERS_BUCKET, USERS_IMAGE_FILE_EXTENSION } from './user.constants';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly s3Service: S3Service,
+  ) {}
 
   private async hashPassword(password: string) {
     return bcrypt.hash(password, 10);
@@ -65,5 +70,13 @@ export class UserService {
       throw new UnauthorizedException('Credentials are not valid.');
     }
     return user;
+  }
+
+  async uploadProfileImage(file: Buffer, userId: string) {
+    await this.s3Service.uploadFile({
+      bucket: USERS_BUCKET,
+      key: `${userId}.${USERS_IMAGE_FILE_EXTENSION}`,
+      file,
+    });
   }
 }
