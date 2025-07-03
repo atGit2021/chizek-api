@@ -65,7 +65,7 @@ export class MessageService {
   }
 
   async getMessages({ forumId, limit, skip }: GetMessagesArgs) {
-    return this.forumRepository.model.aggregate([
+    const messages = await this.forumRepository.model.aggregate([
       { $match: { _id: toObjectId(forumId) } },
       { $unwind: '$messages' },
       { $replaceRoot: { newRoot: '$messages' } },
@@ -84,6 +84,10 @@ export class MessageService {
       { $unset: 'ownerId' },
       { $set: { forumId } },
     ]);
+    for (const message of messages) {
+      message.user = await this.userService.toEntity(message.user);
+    }
+    return messages;
   }
 
   messageCreated() {

@@ -3,9 +3,10 @@ import { UserService } from './user.service';
 import { UserResolver } from './user.resolver';
 import { UserRepository } from './user.repository';
 import { DatabaseModule } from '../../common/database/database.module';
-import { User, UserSchema } from './entities/user.entity';
+import { User } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { S3Module } from 'src/common/s3/s3.module';
+import { UserSchema } from './entities/user.document';
 
 @Module({
   imports: [
