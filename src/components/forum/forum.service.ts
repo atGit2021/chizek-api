@@ -6,10 +6,14 @@ import { toObjectId } from '../../common/database/utils/mongo.utils';
 import { PipelineStage } from 'mongoose';
 import { Forum } from './entities/forum.entity';
 import { PaginationArgs } from '../../common/dto/pagination-args.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class ForumService {
-  constructor(private readonly forumRepository: ForumRepository) {}
+  constructor(
+    private readonly forumRepository: ForumRepository,
+    private readonly userService: UserService,
+  ) {}
 
   async create(createForumInput: CreateForumInput, userId: string) {
     return this.forumRepository.create({
@@ -54,7 +58,9 @@ export class ForumService {
         delete forum.latestMessage;
         return;
       }
-      forum.latestMessage.user = forum.latestMessage.user[0];
+      forum.latestMessage.user = this.userService.toEntity(
+        forum.latestMessage.user[0],
+      );
       delete forum.latestMessage.userId;
       forum.latestMessage.forumId = forum._id;
     });

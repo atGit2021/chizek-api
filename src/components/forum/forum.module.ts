@@ -5,9 +5,11 @@ import { ForumResolver } from './forum.resolver';
 import { ForumRepository } from './forum.repository';
 import { MessageModule } from './message/message.module';
 import { ForumDocument, ForumSchema } from './entities/forum.document';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
+    UserModule,
     MongooseModule.forFeature([
       { name: ForumDocument.name, schema: ForumSchema },
     ]),

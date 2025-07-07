@@ -7,46 +7,49 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { TokenPayload } from '../auth/token-payload.interface';
+import { toObjectId } from 'src/common/database/utils/mongo.utils';
 
 @Resolver(() => User)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Mutation(() => User)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+  async createUser(
+    @Args('createUserInput') createUserInput: CreateUserInput,
+  ): Promise<User> {
     return this.userService.create(createUserInput);
   }
 
   @Query(() => [User], { name: 'users' })
   @UseGuards(GqlAuthGuard)
-  findAll() {
+  async findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
 
   @Query(() => User, { name: 'user' })
   @UseGuards(GqlAuthGuard)
-  findOne(@Args('_id') _id: string) {
+  async findOne(@Args('_id') _id: string): Promise<User> {
     return this.userService.findOne(_id);
   }
 
   @Mutation(() => User)
   @UseGuards(GqlAuthGuard)
-  updateUser(
+  async updateUser(
     @Args('updateUserInput') updateUserInput: UpdateUserInput,
     @CurrentUser() user: TokenPayload,
-  ) {
+  ): Promise<User> {
     return this.userService.update(user._id, updateUserInput);
   }
 
   @Mutation(() => User)
   @UseGuards(GqlAuthGuard)
-  removeUser(@CurrentUser() user: TokenPayload) {
+  async removeUser(@CurrentUser() user: TokenPayload): Promise<User> {
     return this.userService.remove(user._id);
   }
 
   @Query(() => User)
   @UseGuards(GqlAuthGuard)
-  getCurrentUser(@CurrentUser() user: TokenPayload) {
-    return user;
+  async getCurrentUser(@CurrentUser() user: TokenPayload): Promise<User> {
+    return { ...user, _id: toObjectId(user._id) };
   }
 }
