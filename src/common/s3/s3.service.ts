@@ -10,8 +10,11 @@ export class S3Service {
   constructor(private readonly configService: ConfigService) {
     const accessKeyId = configService.get('AWS_ACCESS_KEY');
     const secretAccessKey = configService.get('AWS_SECRET_ACCESS_KEY');
+    const region = configService.get('AWS_REGION');
 
-    const clientConfig: S3ClientConfig = {};
+    const clientConfig: S3ClientConfig = {
+      region,
+    };
     if (accessKeyId && secretAccessKey) {
       clientConfig.credentials = {
         accessKeyId,
