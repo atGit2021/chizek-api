@@ -8,7 +8,7 @@ A NestJS-based GraphQL API for the Chizek application, providing forum and chat 
 - MongoDB integration with Mongoose
 - Authentication using JWT
 - Forum functionality
-- Real-time AI integrated chat (coming soon)
+- Real-time chat
 
 ## Prerequisites
 
@@ -90,9 +90,14 @@ yarn install
 
 ```env
 DB_NAME=your_db_name
+PORT=
 MONGODB_URI=mongodb://your_db_url
+TESTDB_URI=mongodb://your_test_db_url
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRATION=your_duration
+AWS_REGION=
+AWS_ACCESS_KEY=
+AWS_SECRET_ACCESS_KEY=
 ```
 
 ## Running the Database
