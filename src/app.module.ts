@@ -30,6 +30,7 @@ import { UserController } from './components/user/user.controller';
       driver: ApolloDriver,
       useFactory: (authService: AuthService) => ({
         autoSchemaFile: true,
+        cors: true,
         subscriptions: {
           'graphql-ws': {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
