@@ -29,6 +29,8 @@ export class AuthService {
       httpOnly: true,
       expires: expires,
     });
+
+    return token;
   }
 
   verifyWs(request: Request): TokenPayload {
