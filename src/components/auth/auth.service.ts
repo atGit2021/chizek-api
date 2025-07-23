@@ -33,24 +33,16 @@ export class AuthService {
     return token;
   }
 
-  verifyWs(request: Request): TokenPayload {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  verifyWs(request: Request, connectionParams: any = {}): TokenPayload {
     const cookies: string[] = request.headers.cookie?.split('; ') || [];
-    const authCookie = cookies.find((cookie) =>
+    const authCookie = cookies?.find((cookie) =>
       cookie.includes('Authentication'),
     );
-    if (!authCookie) {
-      throw new UnauthorizedException('Authentication cookie not found');
-    }
 
     const jwt = authCookie.split('Authentication=')[1];
-    if (!jwt) {
-      throw new UnauthorizedException(
-        'Token is missing in the Authentication cookie',
-      );
-    }
-
     try {
-      return this.jwtService.verify<TokenPayload>(jwt);
+      return this.jwtService.verify(jwt || connectionParams.token);
     } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
