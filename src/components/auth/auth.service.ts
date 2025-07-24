@@ -30,7 +30,7 @@ export class AuthService {
       expires: expires,
     });
 
-    return token;
+    return { token };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
