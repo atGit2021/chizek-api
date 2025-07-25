@@ -35,17 +35,26 @@ export class AuthService {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verifyWs(request: Request, connectionParams: any = {}): TokenPayload {
-    const cookies: string[] = request.headers.cookie?.split('; ') || [];
-    const authCookie = cookies?.find((cookie) =>
-      cookie.includes('Authentication'),
-    );
+    let jwt = connectionParams.token;
 
-    const jwt = authCookie.split('Authentication=')[1];
-    try {
-      return this.jwtService.verify(jwt || connectionParams.token);
-    } catch {
-      throw new UnauthorizedException('Invalid or expired token');
+    if (!jwt && request.headers?.cookie) {
+      const cookies: string[] = request.headers.cookie?.split('; ') || [];
+      const authCookie = cookies?.find((cookie) =>
+        cookie.includes('Authentication'),
+      );
+
+      if (authCookie) {
+        jwt = authCookie.split('Authentication=')[1];
+      }
     }
+
+    jwt = jwt?.replace(/^Bearer\s/, '');
+
+    if (!jwt) {
+      throw new UnauthorizedException('Missing token');
+    }
+
+    return this.jwtService.verify(jwt);
   }
 
   logout(response: Response) {
