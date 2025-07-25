@@ -24,6 +24,8 @@ A NestJS-based GraphQL API for the Chizek application, providing forum and chat 
 - NestJS CLI (^11.0.0)
 - NestJS Core (^11.0.6)
 - GraphQL (^16.10.0)
+- GraphQL Subscriptions (^3.0.0)
+- GraphQL Websocket (^6.0.4)
 - Apollo Server (^4.11.3)
 - Mongoose (^8.9.4)
 - MongoDB Driver (^6.12.0)
