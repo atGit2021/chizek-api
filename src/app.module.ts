@@ -31,6 +31,14 @@ import { UserController } from './components/user/user.controller';
       useFactory: (authService: AuthService) => ({
         autoSchemaFile: true,
         cors: true,
+        context: async ({ req, connection }) => {
+          if (connection) {
+            return {
+              ...connection.context,
+            };
+          }
+          return { req };
+        },
         subscriptions: {
           'graphql-ws': {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
