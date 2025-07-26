@@ -37,11 +37,11 @@ import { UserController } from './components/user/user.controller';
             onConnect: (context: any) => {
               try {
                 const request: Request = context.extra.request;
-                const user = authService.verifyWs(
-                  request,
-                  context.connectionParams,
-                );
-                context.user = user;
+                const connectionParams = context.connectionParams || {};
+
+                const user = authService.verifyWs(request, connectionParams);
+                console.log('context.user: ', context.user);
+                return { user, connectionParams };
               } catch (err) {
                 new Logger().error(err);
                 throw new UnauthorizedException();
