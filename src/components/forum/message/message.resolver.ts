@@ -32,7 +32,7 @@ export class MessageResolver {
 
   @Subscription(() => Message, {
     filter: (payload, variables: MessageCreatedArgs, context) => {
-      const userId = context.user._id;
+      const userId = context.req.user._id;
       const message: Message = payload.messageCreated;
       return (
         variables.forumIds.includes(message.forumId) &&
