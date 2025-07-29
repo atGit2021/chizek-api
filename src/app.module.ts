@@ -31,14 +31,6 @@ import { UserController } from './components/user/user.controller';
       useFactory: (authService: AuthService) => ({
         autoSchemaFile: true,
         cors: true,
-        context: async ({ req, connection }) => {
-          if (connection) {
-            return {
-              ...connection.context,
-            };
-          }
-          return { req };
-        },
         subscriptions: {
           'graphql-ws': {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,8 +40,7 @@ import { UserController } from './components/user/user.controller';
                 const connectionParams = context.connectionParams || {};
 
                 const user = authService.verifyWs(request, connectionParams);
-                console.log('context.user: ', context.user);
-                return { user, connectionParams };
+                context.user = user;
               } catch (err) {
                 new Logger().error(err);
                 throw new UnauthorizedException();
