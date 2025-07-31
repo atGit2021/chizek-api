@@ -35,7 +35,6 @@ import { UserController } from './components/user/user.controller';
           autoSchemaFile: true,
           cors: {
             origin: corsOrigin,
-            credentials: true,
           },
           subscriptions: {
             'graphql-ws': {
