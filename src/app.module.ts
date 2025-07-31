@@ -33,7 +33,10 @@ import { UserController } from './components/user/user.controller';
 
         return {
           autoSchemaFile: true,
-          cors: true,
+          cors: {
+            origin: corsOrigin,
+            credentials: true,
+          },
           subscriptions: {
             'graphql-ws': {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
