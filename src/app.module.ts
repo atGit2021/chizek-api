@@ -28,29 +28,39 @@ import { UserController } from './components/user/user.controller';
     }),
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      useFactory: (authService: AuthService) => ({
-        autoSchemaFile: true,
-        cors: true,
-        subscriptions: {
-          'graphql-ws': {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onConnect: (context: any) => {
-              try {
-                const request: Request = context.extra.request;
-                const connectionParams = context.connectionParams || {};
+      useFactory: (authService: AuthService, configService: ConfigService) => {
+        const corsOrigin = configService.get<string>('CORS_ORIGIN');
 
-                const user = authService.verifyWs(request, connectionParams);
-                context.user = user;
-              } catch (err) {
-                new Logger().error(err);
-                throw new UnauthorizedException();
-              }
+        return {
+          autoSchemaFile: true,
+          cors: true,
+          subscriptions: {
+            'graphql-ws': {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onConnect: (context: any) => {
+                try {
+                  const request: Request = context.extra.request;
+                  const origin = request.headers.origin;
+                  const connectionParams = context.connectionParams || {};
+
+                  if (origin && origin !== corsOrigin) {
+                    throw new UnauthorizedException(
+                      `Origin not allowed: ${origin}`,
+                    );
+                  }
+                  const user = authService.verifyWs(request, connectionParams);
+                  context.user = user;
+                } catch (err) {
+                  new Logger().error(err);
+                  throw new UnauthorizedException();
+                }
+              },
             },
           },
-        },
-      }),
+        };
+      },
       imports: [AuthModule],
-      inject: [AuthService],
+      inject: [AuthService, ConfigService],
     }),
     DatabaseModule,
     LoggerModule.forRootAsync({
